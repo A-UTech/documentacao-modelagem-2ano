@@ -1,91 +1,98 @@
-CREATE TABLE planos (
-    id SERIAL NOT NULL UNIQUE,
-    nome VARCHAR(255) NOT NULL,
-    preco NUMERIC NOT NULL,
-    armazenaento VARCHAR(255) NOT NULL,
-    PRIMARY KEY(id)
-);
 
 CREATE TABLE empresa (
-    id SERIAL NOT NULL UNIQUE,
-    nome VARCHAR(255) NOT NULL,
-    cnpj VARCHAR(255) NOT NULL,
-    id_plano INTEGER NOT NULL REFERENCES planos(id),
-    PRIMARY KEY(id)
+    id SERIAL PRIMARY KEY,
+    nome VARCHAR(255)
 );
+
+
+CREATE TABLE planos (
+    id SERIAL PRIMARY KEY,
+    nome VARCHAR(255),
+    preco NUMERIC,
+    armazenaento VARCHAR(255)
+);
+
+
+CREATE TABLE unidade (
+    id SERIAL PRIMARY KEY,
+    nome VARCHAR(255),
+    estado VARCHAR(255),
+    cidade VARCHAR(255),
+    cnpj VARCHAR(255),
+    id_plano INTEGER NOT NULL REFERENCES planos(id),
+    id_empresa INTEGER NOT NULL REFERENCES empresa(id)
+);
+
 
 CREATE TABLE turno (
-    id SERIAL NOT NULL UNIQUE,
-    nome VARCHAR(255) NOT NULL,
-    inicio TIME NOT NULL,
-    fim TIME NOT NULL,
-    id_empresa INTEGER REFERENCES empresa(id),
-    PRIMARY KEY(id)
+    id SERIAL PRIMARY KEY,
+    nome VARCHAR(255),
+    inicio TIME,
+    fim TIME,
+    id_unidade INTEGER NOT NULL REFERENCES unidade(id)
 );
+
 
 CREATE TABLE condena (
-    id SERIAL NOT NULL UNIQUE,
-    nome VARCHAR(255) NOT NULL,
-    tipo VARCHAR(255) NOT NULL,
-    PRIMARY KEY(id)
+    id SERIAL PRIMARY KEY,
+    nome VARCHAR(255),
+    tipo VARCHAR(255)
 );
 
+
 CREATE TABLE Gestor (
-    id SERIAL NOT NULL UNIQUE,
+    id SERIAL PRIMARY KEY,
     nome VARCHAR(255),
     email VARCHAR(255),
     senha VARCHAR(255),
     cpf VARCHAR(255),
-    id_empresa INTEGER REFERENCES empresa(id),
-    PRIMARY KEY(id)
+    id_unidade INTEGER NOT NULL REFERENCES unidade(id)
 );
 
-CREATE TABLE condena_gestor (
-    id SERIAL NOT NULL UNIQUE,
-    id_condena INTEGER NOT NULL REFERENCES condena(id),
-    id_gestor INTEGER NOT NULL REFERENCES Gestor(id),
-    PRIMARY KEY(id)
-);
-
-CREATE TABLE usuario_log (
-    id SERIAL NOT NULL UNIQUE,
-    tabela VARCHAR(255) NOT NULL,
-    id_afetado INTEGER NOT NULL,
-    operacao VARCHAR(255) NOT NULL,
-    id_usuario INTEGER NOT NULL,
-    data_hora TIMESTAMP NOT NULL,
-    PRIMARY KEY(id)
-);
-
-CREATE TABLE admin (
-    id SERIAL NOT NULL UNIQUE,
-    nome VARCHAR(255) NOT NULL,
-    email VARCHAR(255) NOT NULL,
-    PRIMARY KEY(id)
-);
-
-CREATE TABLE admin_log (
-    id SERIAL NOT NULL UNIQUE,
-    tabela VARCHAR(255) NOT NULL,
-    id_afetado INTEGER NOT NULL,
-    operacao VARCHAR(255) NOT NULL,
-    id_admin INTEGER NOT NULL REFERENCES admin(id),
-    data_hora TIMESTAMP NOT NULL,
-    PRIMARY KEY(id)
-);
 
 CREATE TABLE lider (
-    id SERIAL NOT NULL UNIQUE,
+    id SERIAL PRIMARY KEY,
     nome VARCHAR(255),
     email VARCHAR(255),
     senha VARCHAR(255),
     cpf VARCHAR(255),
     area VARCHAR(255),
-    id_empresa INTEGER REFERENCES empresa(id),
-    PRIMARY KEY(id)
+    id_unidade INTEGER NOT NULL REFERENCES unidade(id)
 );
 
 
+CREATE TABLE condena_gestor (
+    id_condena INTEGER NOT NULL REFERENCES condena(id),
+    id_gestor INTEGER NOT NULL REFERENCES Gestor(id),
+    PRIMARY KEY(id_condena, id_gestor)
+);
+
+
+CREATE TABLE admin (
+    id SERIAL PRIMARY KEY,
+    nome VARCHAR(255),
+    email VARCHAR(255)
+);
+
+
+CREATE TABLE admin_log (
+    id SERIAL PRIMARY KEY,
+    tabela VARCHAR(255),
+    id_afetado INTEGER,
+    operacao VARCHAR(255),
+    id_admin INTEGER NOT NULL REFERENCES admin(id),
+    data_hora TIMESTAMP
+);
+
+
+CREATE TABLE supervisor_log (
+    id SERIAL PRIMARY KEY,
+    tabela VARCHAR(255),
+    id_afetado INTEGER,
+    operacao VARCHAR(255),
+    id_supervisor INTEGER NOT NULL,
+    data_hora TIMESTAMP
+);
 -- 1) PLANOS
 INSERT INTO planos (nome, preco, armazenaento) VALUES
 ('Básico', 49.90, '2 TB'),
@@ -95,41 +102,54 @@ INSERT INTO planos (nome, preco, armazenaento) VALUES
 ('Mega Plan', 999.90, '12 TB');
 
 -- 2) EMPRESA
-INSERT INTO empresa (nome, cnpj, id_plano) VALUES
-('Panatem', '12.345.678/0001-90', 1),
-('BIMO', '23.456.789/0001-81', 2),
-('Khiata', '34.567.890/0001-72', 3),
-('Tropicalias', '45.678.901/0001-63', 4),
-('Athleta', '56.789.012/0001-54', 5),
-('Ficção', '67.890.123/0001-45', 1),
-('Demeter', '78.901.234/0001-36', 2),
-('Eos', '89.012.345/0001-27', 3),
-('ChickenCare', '90.123.456/0001-18', 4),
-('KFC', '01.234.567/0001-09', 5);
+INSERT INTO empresa (nome) VALUES
+('Panatem'),
+('BIMO'),
+('Khiata'),
+('Tropicalias'),
+('Athleta'),
+('Ficção'),
+('Demeter'),
+('Eos'),
+('ChickenCare'),
+('KFC');
 
--- 3) GESTOR
-INSERT INTO Gestor (nome, email, senha, cpf, id_empresa) VALUES
+-- 3) UNIDADE
+INSERT INTO unidade (nome, estado, cidade, cnpj, id_plano, id_empresa) VALUES
+('Panatem Osasco', 'SP', 'Osasco', '12.345.678/0001-90', 1, 1),
+('BIMO São Paulo', 'SP', 'São Paulo', '23.456.789/0001-81', 2, 2),
+('Khiata Maranhão', 'MA', 'São Luís', '34.567.890/0001-72', 3, 3),
+('Tropicalias Barueri', 'SP', 'Barueri', '45.678.901/0001-63', 4, 4),
+('Athleta BH', 'MG', 'Belo Horizonte', '56.789.012/0001-54', 5, 5),
+('Ficção Porto Alegre', 'RS', 'Porto Alegre', '67.890.123/0001-45', 1, 6),
+('Demeter Carpazinha', 'RS', 'Carpazinha', '78.901.234/0001-36', 2, 7),
+('Eos Recife', 'PE', 'Recife', '89.012.345/0001-27', 3, 8),
+('ChickenCare Carapicuíba', 'SP', 'Carapicuíba', '90.123.456/0001-18', 4, 9),
+('KFC Salvador', 'BA', 'Salvador', '01.234.567/0001-09', 5, 10);
+
+-- 4) GESTOR
+INSERT INTO Gestor (nome, email, senha, cpf, id_unidade) VALUES
 ('Daniel Freitas', 'daniel.freitas@gmail.com', '1234', '111.111.111-11', 1),
 ('João Veigas Sobral', 'joao.veigas@gmail.com', '1234', '222.222.222-22', 2),
 ('Paulo Vaz', 'paulo.vaz@gmail.com', '1234', '333.333.333-33', 3),
 ('Pedro Teixeira', 'pedro.teixeira@gmail.com', '1234', '444.444.444-44', 4),
 ('Daniel Severo', 'daniel.severo@gmail.com', '1234', '555.555.555-55', 5);
 
--- 4) LIDER
-INSERT INTO lider (nome, email, senha, cpf, area, id_empresa) VALUES
-('Thiago Gabriel Marinho Cardoso', 'thiago.gabriel@gmail.com', 'abcd', '666.666.666-66', 'Área 1', 1),
+-- 5) LIDER
+INSERT INTO lider (nome, email, senha, cpf, area, id_unidade) VALUES
+('Thiago Gabriel Marinho Cardoso', 'thiago.gabriel@gmail.com', 'abcd', '676.767.676-76', 'Área 1', 1),
 ('Matheus Bastos', 'matheus.bastos@gmail.com', 'abcd', '777.777.777-77', 'Área 2', 2),
 ('Marcelo Grilo', 'marcelo.grilo@gmail.com', 'abcd', '888.888.888-88', 'Área 3', 3),
 ('Marcelo Modolo', 'marcelo.modolo@gmail.com', 'abcd', '999.999.999-99', 'Área 4', 4),
 ('Alex Santos', 'alex.santos@gmail.com', 'abcd', '000.000.000-00', 'Área 5', 5);
 
--- 5) TURNO
-INSERT INTO turno (nome, inicio, fim, id_empresa) VALUES
+-- 6) TURNO
+INSERT INTO turno (nome, inicio, fim, id_unidade) VALUES
 ('Manhã', '00:00', '08:00', 1),
 ('Tarde', '08:00', '16:00', 2),
 ('Noite', '16:00', '23:59', 3);
 
--- 6) CONDENA
+-- 7) CONDENA
 INSERT INTO condena (nome, tipo) VALUES
 ('Aero Saculite T', 'Total'),
 ('Artrite T', 'Total'),
@@ -142,7 +162,7 @@ INSERT INTO condena (nome, tipo) VALUES
 ('Lesão da pele P', 'Parcial'),
 ('Sangria inadequada', 'Parcial');
 
--- 7) CONDENA_GESTOR 
+-- 8) CONDENA_GESTOR
 INSERT INTO condena_gestor (id_condena, id_gestor) VALUES
 (1,1),
 (2,2),
@@ -155,7 +175,7 @@ INSERT INTO condena_gestor (id_condena, id_gestor) VALUES
 (9,4),
 (10,5);
 
--- 8) ADMIN
+-- 9) ADMIN
 INSERT INTO admin (nome, email) VALUES
 ('Gabriel Martins', 'gabriel.martins@gmail.com'),
 ('Rafaela Barreta', 'rafaela.barreta@gmail.com'),
