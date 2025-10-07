@@ -85,12 +85,22 @@ CREATE TABLE admin_log (
 );
 
 
-CREATE TABLE supervisor_log (
+CREATE TABLE gestor_log (
     id SERIAL PRIMARY KEY,
     tabela VARCHAR(255),
     id_afetado INTEGER,
     operacao VARCHAR(255),
-    id_supervisor INTEGER NOT NULL,
+    id_gestor INTEGER NOT NULL,
+    data_hora TIMESTAMP
+);
+
+CREATE TABLE empresa_log (
+    id SERIAL PRIMARY KEY,
+    tabela VARCHAR(255),
+    id_afetado INTEGER,
+    operacao VARCHAR(255),
+    id_empresa INTEGER NOT NULL REFERENCES empresa(id),
+    id_unidade INTEGER NOT NULL REFERENCES unidade(id),
     data_hora TIMESTAMP
 );
 -- 1) PLANOS
@@ -125,7 +135,17 @@ INSERT INTO unidade (nome, estado, cidade, cnpj, id_plano, id_empresa) VALUES
 ('Demeter Carpazinha', 'RS', 'Carpazinha', '78.901.234/0001-36', 2, 7),
 ('Eos Recife', 'PE', 'Recife', '89.012.345/0001-27', 3, 8),
 ('ChickenCare Carapicuíba', 'SP', 'Carapicuíba', '90.123.456/0001-18', 4, 9),
-('KFC Salvador', 'BA', 'Salvador', '01.234.567/0001-09', 5, 10);
+('KFC Salvador', 'BA', 'Salvador', '01.234.567/0001-09', 5, 10),
+('Panatem Campinas', 'SP', 'Campinas', '11.223.344/0001-55', 1, 1),
+('BIMO Rio de Janeiro', 'RJ', 'Rio de Janeiro', '22.334.455/0001-66', 2, 2),
+('Khiata Fortaleza', 'CE', 'Fortaleza', '33.445.566/0001-77', 3, 3),
+('Tropicalias Curitiba', 'PR', 'Curitiba', '44.556.677/0001-88', 4, 4),
+('Athleta Vitória', 'ES', 'Vitória', '55.667.788/0001-99', 5, 5),
+('Ficção Florianópolis', 'SC', 'Florianópolis', '66.778.899/0001-00', 1, 6),
+('Demeter Goiânia', 'GO', 'Goiânia', '77.889.900/0001-11', 2, 7),
+('Eos Manaus', 'AM', 'Manaus', '88.990.011/0001-22', 3, 8),
+('ChickenCare Belém', 'PA', 'Belém', '99.001.122/0001-33', 4, 9),
+('KFC Brasília', 'DF', 'Brasília', '10.112.233/0001-44', 5, 10);
 
 -- 4) GESTOR
 INSERT INTO Gestor (nome, email, senha, cpf, id_unidade) VALUES
@@ -133,7 +153,8 @@ INSERT INTO Gestor (nome, email, senha, cpf, id_unidade) VALUES
 ('João Veigas Sobral', 'joao.veigas@gmail.com', '1234', '222.222.222-22', 2),
 ('Paulo Vaz', 'paulo.vaz@gmail.com', '1234', '333.333.333-33', 3),
 ('Pedro Teixeira', 'pedro.teixeira@gmail.com', '1234', '444.444.444-44', 4),
-('Daniel Severo', 'daniel.severo@gmail.com', '1234', '555.555.555-55', 5);
+('Daniel Severo', 'daniel.severo@gmail.com', '1234', '555.555.555-55', 5),
+('Gabriel Bento', 'gabriel.bento@gmail.com', '1234', '676.676.767-67', 1);
 
 -- 5) LIDER
 INSERT INTO lider (nome, email, senha, cpf, area, id_unidade) VALUES
@@ -141,7 +162,8 @@ INSERT INTO lider (nome, email, senha, cpf, area, id_unidade) VALUES
 ('Matheus Bastos', 'matheus.bastos@gmail.com', 'abcd', '777.777.777-77', 'Área 2', 2),
 ('Marcelo Grilo', 'marcelo.grilo@gmail.com', 'abcd', '888.888.888-88', 'Área 3', 3),
 ('Marcelo Modolo', 'marcelo.modolo@gmail.com', 'abcd', '999.999.999-99', 'Área 4', 4),
-('Alex Santos', 'alex.santos@gmail.com', 'abcd', '000.000.000-00', 'Área 5', 5);
+('Alex Santos', 'alex.santos@gmail.com', 'abcd', '000.000.000-00', 'Área 5', 5),
+('Igor Malaquias', 'igor.malaquias@gmail.com', 'abcd', '123.321.222-23', 'Escaldagem', 1);
 
 -- 6) TURNO
 INSERT INTO turno (nome, inicio, fim, id_unidade) VALUES
