@@ -103,6 +103,13 @@ CREATE TABLE empresa_log (
     id_unidade INTEGER NOT NULL REFERENCES unidade(id),
     data_hora TIMESTAMP
 );
+
+CREATE TABLE daily_active_users(
+    id INTEGER,
+    id_usuario INTEGER,
+    hora_entrada TIMESTAMP
+);
+
 -- 1) PLANOS
 INSERT INTO planos (nome, preco, armazenaento) VALUES
 ('Básico', 49.90, '2 TB'),

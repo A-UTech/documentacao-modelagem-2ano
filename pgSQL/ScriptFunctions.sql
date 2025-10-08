@@ -1,5 +1,5 @@
-
--- Função para log de admin
+-- FUNÇÕES DE TRIGGER PARA TABELAS LOG
+-- Função para 'ADMIN_LOG'
 CREATE OR REPLACE FUNCTION log_admin() RETURNS TRIGGER LANGUAGE plpgsql AS $$
 DECLARE
 	v_id_afetado int;
@@ -24,15 +24,15 @@ BEGIN
 END;
 $$;
 
--- Função para log de supervisor
-CREATE OR REPLACE FUNCTION log_supervisor() RETURNS TRIGGER LANGUAGE plpgsql AS $$
+-- Função para 'GESTOR_LOG'
+CREATE OR REPLACE FUNCTION log_gestor() RETURNS TRIGGER LANGUAGE plpgsql AS $$
 DECLARE
 	v_id_afetado int;
-	v_id_supervisor int;
+	v_id_gestor int;
 BEGIN
-	v_id_supervisor := current_setting('log.supervisor_id', true)::int;
+	v_id_gestor := current_setting('log.gestor_id', true)::int;
 
-	IF v_id_supervisor IS NULL THEN
+	IF v_id_gestor IS NULL THEN
 		RETURN NULL;
 	END IF;
 	IF TG_OP = 'DELETE' THEN
@@ -40,29 +40,99 @@ BEGIN
 	ELSE
 		v_id_afetado := NEW.id;
 	END IF;
-	INSERT INTO supervisor_log (
-		tabela, id_afetado, operacao, id_supervisor, data_hora
+	INSERT INTO gestor_log (
+		tabela, id_afetado, operacao, id_gestor, data_hora
 	) VALUES (
-		TG_TABLE_NAME, v_id_afetado, TG_OP, v_id_supervisor, NOW()
+		TG_TABLE_NAME, v_id_afetado, TG_OP, v_id_gestor, NOW()
 	);
 	RETURN NULL;
 END;
 $$;
 
--- Trigger para admin
+-- Função para 'EMPRESA_LOG'
+CREATE OR REPLACE FUNCTION log_empresa() RETURNS TRIGGER LANGUAGE plpgsql AS $$
+DECLARE
+	v_id_afetado int;
+	v_id_empresa int;
+	v_id_unidade int;
+BEGIN
+	v_id_empresa := current_setting('log.empresa_id', true)::int;
+	v_id_unidade := current_setting('log.unidade_id')
+
+	IF v_id_empresa IS NULL OR v_id_unidade IS NULL THEN
+		RETURN NULL;
+	END IF;
+	IF TG_OP = 'DELETE' THEN
+		v_id_afetado := OLD.id;
+	ELSE
+		v_id_afetado := NEW.id;
+	END IF;
+	INSERT INTO empresa_log(
+		tabela, id_afetado, operacao, id_empresa, id_unidade, data_hora
+	) VALUES (
+		TG_TABLE_NAME, v_id_afetado, TG_OP, v_id_empresa, v_id_unidade, NOW()
+	);
+	RETURN NULL;
+END;
+$$;
+
+-- =====================================================
+-- TRIGGERS PARA TABELAS DE LOG
+-- Triggers para 'ADMIN_LOG'
+-- tabela 'admin'
 CREATE OR REPLACE TRIGGER trg_log_admin
 AFTER INSERT OR UPDATE OR DELETE ON admin
 FOR EACH ROW EXECUTE FUNCTION log_admin();
 
--- Trigger para supervisor
-CREATE OR REPLACE TRIGGER trg_log_supervisor
-AFTER INSERT OR UPDATE OR DELETE ON supervisor
-FOR EACH ROW EXECUTE FUNCTION log_supervisor();
+-- tabela 'planos'
+CREATE OR REPLACE TRIGGER trg_log_admin_planos
+AFTER INSERT OR UPDATE OR DELETE ON planos
+FOR EACH ROW EXECUTE FUNCTION log_admin();
 
--- Procedure para inserir unidade e verificar empresa
+-- tabela 'condena'
+CREATE OR REPLACE TRIGGER trg_log_admin_condena
+AFTER INSERT OR UPDATE OR DELETE ON condena
+FOR EACH ROW EXECUTE FUNCTION log_admin();
+-- =====================================================
+
+-- Triggers para 'GESTOR_LOG'
+-- tabela 'lider'
+CREATE OR REPLACE TRIGGER trg_log_gestor_lider
+AFTER INSERT OR UPDATE OR DELETE ON lider
+FOR EACH ROW EXECUTE FUNCTION log_gestor();
+
+-- tabela 'gestor'
+CREATE OR REPLACE TRIGGER trg_log_gestor
+AFTER INSERT OR UPDATE OR DELETE ON gestor
+FOR EACH ROW EXECUTE FUNCTION log_gestor();
+
+-- tabela 'condena_gestor'
+CREATE OR REPLACE TRIGGER trg_log_gestor_condena
+AFTER INSERT OR UPDATE OR DELETE ON condena_gestor
+FOR EACH ROW EXECUTE FUNCTION log_gestor();
+
+-- =====================================================
+
+-- Triggers para 'EMPRESA_LOG'
+-- tabela 'empresa'
+CREATE OR REPLACE TRIGGER trg_log_empresa
+AFTER INSERT OR UPDATE OR DELETE ON empresa
+FOR EACH ROW EXECUTE FUNCTION log_empresa();
+
+-- tabela 'unidade'
+CREATE OR REPLACE TRIGGER trg_log_empresa_unidade
+AFTER INSERT OR UPDATE OR DELETE ON unidade
+FOR EACH ROW EXECUTE FUNCTION log_empresa();
+
+-- PROCEDURES ==========================================
+
+-- Procedure 1 (inserir unidade e verificar empresa)
 CREATE OR REPLACE PROCEDURE inserir_unidade_por_nome(
     p_nome_unidade VARCHAR,
-    p_endereco VARCHAR,
+    p_estado VARCHAR,
+	p_cidade VARCHAR,
+	p_cnpj VARCHAR,
+	p_id_plano INTEGER,
     p_nome_empresa VARCHAR
 )
 LANGUAGE plpgsql AS $$
@@ -73,7 +143,7 @@ BEGIN
     SELECT id INTO v_id_empresa
     FROM empresa
     WHERE 
-        -- normaliza: remove espaços e converte para minúsculas
+        -- remove espaços e converte para minúsculas
         LOWER(REGEXP_REPLACE(TRIM(nome), '[^a-zA-Z0-9]', '', 'g')) =
         LOWER(REGEXP_REPLACE(TRIM(p_nome_empresa), '[^a-zA-Z0-9]', '', 'g'))
     LIMIT 1;
@@ -84,30 +154,37 @@ BEGIN
     END IF;
 
     -- Inserir a unidade
-    INSERT INTO unidade (nome, endereco, id_empresa)
-    VALUES (p_nome_unidade, p_endereco, v_id_empresa);
+    INSERT INTO unidade (nome, estado, cidade, cnpj, id_plano, id_empresa)
+    VALUES (p_nome_unidade, p_estado, p_cidade, p_cnpj, p_id_plano, v_id_empresa);
 END;
 $$;
 
-
-
--- Função para autenticação de gestor
-CREATE OR REPLACE FUNCTION autenticar_gestor(
-	p_email VARCHAR,
-	p_senha VARCHAR
+-- FUNCTIONS ===========================================
+-- Function 1 (Verificar se o usuário é gestor ou lider)
+CREATE OR REPLACE FUNCTION autenticar_usuario( 
+    p_email VARCHAR,
+    p_senha VARCHAR
 )
 RETURNS TABLE (
-	id INTEGER,
-	nome VARCHAR,
-	email VARCHAR,
-	cpf VARCHAR,
-	id_empresa INTEGER
+    id INTEGER,
+    nome VARCHAR,
+    email VARCHAR,
+    cpf VARCHAR,
+    id_empresa INTEGER,
+    tipo_usuario VARCHAR
 )
 LANGUAGE plpgsql AS $$
 BEGIN
-	RETURN QUERY
-		SELECT id, nome, email, cpf, id_empresa
-		FROM gestor
-		WHERE email = p_email AND senha = p_senha;
+    -- Tenta autenticar como gestor
+    RETURN QUERY
+    SELECT id, nome, email, cpf, id_empresa, 'gestor' AS tipo_usuario
+    FROM gestor
+    WHERE email = p_email AND senha = p_senha;
+
+    -- Se não encontrar gestor, tenta líder
+    RETURN QUERY
+    SELECT id, nome, email, cpf, id_empresa, 'lider' AS tipo_usuario
+    FROM lider
+    WHERE email = p_email AND senha = p_senha;
 END;
 $$;
