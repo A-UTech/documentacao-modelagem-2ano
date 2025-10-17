@@ -9,7 +9,7 @@ CREATE TABLE planos (
     id SERIAL PRIMARY KEY,
     nome VARCHAR(255),
     preco NUMERIC,
-    armazenaento VARCHAR(255)
+    armazenamento VARCHAR(255)
 );
 
 
@@ -19,6 +19,7 @@ CREATE TABLE unidade (
     estado VARCHAR(255),
     cidade VARCHAR(255),
     cnpj VARCHAR(255),
+    senha VARCHAR(255),
     id_plano INTEGER NOT NULL REFERENCES planos(id),
     id_empresa INTEGER NOT NULL REFERENCES empresa(id)
 );
@@ -110,3 +111,6 @@ CREATE TABLE daily_active_users(
     tipo_usuario VARCHAR(50),
     hora_entrada TIMESTAMP
 );
+
+ALTER TABLE unidade
+ADD COLUMN senha VARCHAR(255);
