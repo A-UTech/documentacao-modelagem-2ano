@@ -1,74 +1,44 @@
 [
   {
-    "_id": {"$oid": "68d454bb8faea62f5a6840b7"},
+    "_id": {"$oid": "68ee8ceecb843862e087cead"},
     "condenas": [
       {
-        "nome": "Aspectos repugnantes",
+        "nome": "Condena Teste",
         "tipo": "Parcial",
-        "quantidade": 10
+        "quantidade": 18
       },
       {
-        "nome": "Falha tecnológica",
+        "nome": "Condena Teste 2",
         "tipo": "Total",
-        "quantidade": 34
-      },
-      {
-        "nome": "Sangria inadequada",
-        "tipo": "Parcial",
-        "quantidade": 28
+        "quantidade": 32
       }
     ],
-    "data": {"$date": "2025-09-24T00:00:00.000Z"},
-    "empresa": "Seara B",
-    "gestor": "Rafael Cruz",
-    "turno": 2
+    "data": {"$date": "2025-10-14T00:00:00.000Z"},
+    "empresa": "Athleta",
+    "gestor": "João Veigas Sobral",
+    "lote": "???",
+    "turno": 2,
+    "unidade": "Athleta BH"
   },
   {
-    "_id": {"$oid": "68d454bb8faea62f5a6840b8"},
+    "_id": {"$oid": "68efa5f67ae9bf1b56d6f617"},
     "condenas": [
       {
-        "nome": "Caquexia",
-        "tipo": "Total",
-        "quantidade": 22
-      },
-      {
-        "nome": "Celulite",
+        "nome": "Condena Teste 3",
         "tipo": "Parcial",
         "quantidade": 11
       },
       {
-        "nome": "Lesão da pele",
-        "tipo": "Parcial",
-        "quantidade": 2
-      }
-    ],
-    "data": {"$date": "2025-09-24T00:00:00.000Z"},
-    "empresa": "Seara C",
-    "gestor": "Lucas Lima",
-    "turno": 3
-  },
-  {
-    "_id": {"$oid": "68d454bb8faea62f5a6840b6"},
-    "condenas": [
-      {
-        "nome": "Artrite",
+        "nome": "Condena Teste 4",
         "tipo": "Total",
         "quantidade": 22
-      },
-      {
-        "nome": "Aero Saculite",
-        "tipo": "Total",
-        "quantidade": 15
-      },
-      {
-        "nome": "Celulite",
-        "tipo": "Parcial",
-        "quantidade": 14
       }
     ],
-    "data": {"$date": "2025-09-24T00:00:00.000Z"},
-    "empresa": "Seara A",
-    "gestor": "Gabriel Ferreira",
-    "turno": 1
+    "data": {"$date": "2025-10-15T00:00:00.000Z"},
+    "empresa": "Khiata",
+    "gestor": "Paulo Vaz",
+    "lote": "???",
+    "turno": 2,
+    "unidade": "Khiata Maranhão"
   }
 ]
