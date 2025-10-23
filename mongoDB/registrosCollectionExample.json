@@ -3,11 +3,13 @@
     "_id": {"$oid": "68ee8ceecb843862e087cead"},
     "condenas": [
       {
+        "id": 1,
         "nome": "Condena Teste",
         "tipo": "Parcial",
         "quantidade": 18
       },
       {
+        "id": 2,
         "nome": "Condena Teste 2",
         "tipo": "Total",
         "quantidade": 32
@@ -16,19 +18,21 @@
     "data": {"$date": "2025-10-14T00:00:00.000Z"},
     "empresa": "Athleta",
     "gestor": "João Veigas Sobral",
+    "id_turno": 2,
     "lote": "???",
-    "turno": 2,
     "unidade": "Athleta BH"
   },
   {
     "_id": {"$oid": "68efa5f67ae9bf1b56d6f617"},
     "condenas": [
       {
+        "id": 1,
         "nome": "Condena Teste 3",
         "tipo": "Parcial",
         "quantidade": 11
       },
       {
+        "id": 2,
         "nome": "Condena Teste 4",
         "tipo": "Total",
         "quantidade": 22
@@ -37,8 +41,8 @@
     "data": {"$date": "2025-10-15T00:00:00.000Z"},
     "empresa": "Khiata",
     "gestor": "Paulo Vaz",
+    "id_turno": 2,
     "lote": "???",
-    "turno": 2,
     "unidade": "Khiata Maranhão"
   }
 ]
