@@ -1,0 +1,11 @@
+db.registros.createIndex({unidade:1})
+
+O index acima cria um índice simples no campo "unidade" da coleção "registros".
+O motivo para criar esse índice é melhorar o desempenho das consultas que filtram ou ordenam os documentos com base no campo "unidade", já que ele é muito utilizado nas APIs de consulta.
+
+
+
+
+db.registros.createIndex({unidade: 1, data:-1})
+O índice composto acima cria um índice nos campos "unidade" (ordem crescente) e "data" (ordem decrescente) da coleção "registros".
+O motivo para criar esse índice composto é otimizar consultas que filtram por "unidade" e ordenam os resultados por "data" em ordem decrescente. Esses campos são muito utilizados nas APIs que consultam os registros e nas consultas que o Chatbot realiza para fornecer respostas rápidas e precisas aos usuários.
