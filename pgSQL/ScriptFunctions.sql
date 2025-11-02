@@ -224,6 +224,7 @@ RETURNS TABLE (
 LANGUAGE plpgsql AS $$
 DECLARE
     v_id BIGINT;
+    v_id_empresa BIGINT;
 BEGIN
     -- ADMIN
     SELECT a.id INTO v_id
@@ -261,16 +262,16 @@ BEGIN
     END IF;
 
     -- UNIDADE
-    SELECT u.id, u.id_empresa INTO v_id, v_id
+     SELECT u.id, u.id_empresa
+    INTO v_id, v_id_empresa
     FROM unidade u
     WHERE u.cnpj = p_email_cnpj AND u.senha = p_senha
     LIMIT 1;
 
     IF FOUND THEN
+        -- seta o id da unidade e da empresa, mas retorna só a unidade
         PERFORM set_config('log.unidade_id', v_id::TEXT, false);
-        PERFORM set_config('log.empresa_id', (
-            SELECT id_empresa::TEXT FROM unidade WHERE cnpj = p_email_cnpj LIMIT 1
-        ), false);
+        PERFORM set_config('log.empresa_id', v_id_empresa::TEXT, false);
         RETURN QUERY SELECT v_id, 'unidade';
         RETURN;
     END IF;
