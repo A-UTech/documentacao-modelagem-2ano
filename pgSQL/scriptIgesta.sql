@@ -45,7 +45,6 @@ CREATE TABLE Gestor (
     nome VARCHAR(255),
     email VARCHAR(255),
     senha VARCHAR(255),
-    cpf VARCHAR(255),
     id_unidade INTEGER NOT NULL REFERENCES unidade(id)
 );
 
@@ -55,7 +54,6 @@ CREATE TABLE lider (
     nome VARCHAR(255),
     email VARCHAR(255),
     senha VARCHAR(255),
-    cpf VARCHAR(255),
     area VARCHAR(255),
     id_unidade INTEGER NOT NULL REFERENCES unidade(id)
 );
@@ -119,12 +117,10 @@ ALTER TABLE unidade
 ADD CONSTRAINT unidade_cnpj_uk UNIQUE (cnpj);
 
 ALTER TABLE gestor
-ADD CONSTRAINT gestor_email_uk UNIQUE (email),
-ADD CONSTRAINT gestor_cpf_uk UNIQUE (cpf);
+ADD CONSTRAINT gestor_email_uk UNIQUE (email);
 
 ALTER TABLE lider
-ADD CONSTRAINT lider_email_uk UNIQUE (email),
-ADD CONSTRAINT lider_cpf_uk UNIQUE (cpf);
+ADD CONSTRAINT lider_email_uk UNIQUE (email);
 
 ALTER TABLE admin
 ADD CONSTRAINT admin_email_uk UNIQUE (email);
